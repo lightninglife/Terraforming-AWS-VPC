@@ -1,0 +1,28 @@
+dist: xenial
+language: bash
+
+before_install: # Download and install Terraform for us on the container (v0.12.25)
+  - wget https://releases.hashicorp.com/terraform/0.12.25/terraform_0.12.25_linux_amd64.zip
+  - unzip terraform_0.12.25_linux_amd64.zip
+  - sudo mv terraform /usr/local/bin/
+  - rm terraform_0.12.25_linux_amd64.zip
+
+jobs:
+  include:
+    - stage: terraform plan # When a Pull Request is created - Validate our plan
+      if: type IN (pull_request)
+      script:
+        - terraform init -backend-config backend_config/dev.tfvars
+        - terraform plan -var-file env_vars/dev.tfvars -out build.plan
+
+    - stage: terraform apply # Merge our PR - Deploy it!
+      if: type IN (push) and branch = master
+      script:
+        - terraform init -backend-config backend_config/dev.tfvars
+        - terraform plan -var-file env_vars/dev.tfvars -out build.plan
+        - terraform apply build.plan
+
+# Filter to only run this pipeline when it involves actions against the master branch
+branches:
+  only:
+    - master
