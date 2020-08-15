@@ -13,13 +13,13 @@ jobs:
       if: type IN (pull_request)
       script:
         - terraform init variables.tf
-        - terraform plan -var-file env_vars/variables.tf -out build.plan
+        - terraform plan variables.tf -out build.plan
 
     - stage: terraform apply # Merge our PR - Deploy it!
       if: type IN (push) and branch = master
       script:
         - terraform init variables.tf
-        - terraform plan -var-file env_vars/variables.tf -out build.plan
+        - terraform plan variables.tf -out build.plan
         - terraform apply build.plan
 
 # Filter to only run this pipeline when it involves actions against the master branch
