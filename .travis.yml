@@ -18,7 +18,11 @@ jobs:
     - stage: terraform apply # Merge our PR - Deploy it!
       if: type IN (push) and branch = master
       script:
+<<<<<<< HEAD
         - terraform init
+=======
+        - terraform init 
+>>>>>>> 6ad7dc02a9a90c743e5267eb97c02dbebdd8f156
         - terraform plan -out build.plan
         - terraform apply build.plan
 
